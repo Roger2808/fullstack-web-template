@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Bounded Context: Identity
+
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+model User {
+  id           String   @id @default(uuid())
+  clinicId     String
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         UserRole @default(STAFF)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([clinicId])
+}
+
+// Bounded Context: Contact (public company inquiries)
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+// Bounded Context: Patients
+
+model Patient {
+  id          String   @id @default(uuid())
+  clinicId    String
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  dateOfBirth DateTime
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  invoices       Invoice[]
+
+  @@index([clinicId])
+}
+
+// Bounded Context: Appointments (Scheduling)
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Appointment {
+  id          String            @id @default(uuid())
+  clinicId    String
+  patientId   String
+  patient     Patient           @relation(fields: [patientId], references: [id])
+  doctorName  String
+  scheduledAt DateTime
+  status      AppointmentStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([clinicId])
+  @@index([patientId])
+}
+
+// Bounded Context: Medical Records
+
+model MedicalRecord {
+  id        String   @id @default(uuid())
+  clinicId  String
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  visitDate DateTime
+  diagnosis String
+  treatment String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([clinicId])
+  @@index([patientId])
+}
+
+// Bounded Context: Billing
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model Invoice {
+  id        String        @id @default(uuid())
+  clinicId  String
+  patientId String
+  patient   Patient       @relation(fields: [patientId], references: [id])
+  status    InvoiceStatus @default(PENDING)
+  currency  String        @default("USD")
+  issuedAt  DateTime      @default(now())
+  paidAt    DateTime?
+  items     InvoiceItem[]
+
+  @@index([clinicId])
+  @@index([patientId])
+}
+
+model InvoiceItem {
+  id             String  @id @default(uuid())
+  invoiceId      String
+  invoice        Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description    String
+  quantity       Int
+  unitPriceCents Int
+
+  @@index([invoiceId])
+}
+
+// Bounded Context: Inventory
+
+model InventoryItem {
+  id            String   @id @default(uuid())
+  clinicId      String
+  name          String
+  sku           String
+  quantity      Int      @default(0)
+  minimumStock  Int      @default(0)
+  unitCostCents Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([clinicId, sku])
+  @@index([clinicId])
+}
+
+// Bounded Context: Reporting has no persistence model of its own.
+// It composes read data from the repositories above through explicit contracts.

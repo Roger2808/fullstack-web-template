@@ -1,0 +1,39 @@
+.page {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 420px;
+}
+
+.back {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  width: fit-content;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.header p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
