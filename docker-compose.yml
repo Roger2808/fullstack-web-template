@@ -1,31 +1,32 @@
-frontend:
-  build:
-    context: ./frontend
-    dockerfile: Dockerfile
-    args:
-      NEXT_PUBLIC_API_URL: http://72.60.169.150:4005
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://72.60.169.150:4005
 
-  container_name: sitio2-frontend
+    container_name: sitio2-frontend
 
-  ports:
-    - "4004:3000"
+    ports:
+      - "4004:3000"
 
-  restart: unless-stopped
+    restart: unless-stopped
 
-  depends_on:
-    - backend
+    depends_on:
+      - backend
 
   backend:
-  build:
-    context: ./backend
-    dockerfile: Dockerfile
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
 
-  container_name: sitio2-backend
+    container_name: sitio2-backend
 
-  ports:
-    - "4005:3001"
+    ports:
+      - "4005:3001"
 
-  env_file:
-    - ./backend/.env
+    env_file:
+      - ./backend/.env
 
-  restart: unless-stopped
+    restart: unless-stopped
