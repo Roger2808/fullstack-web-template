@@ -3,17 +3,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-
     container_name: sitio2-frontend
-
     ports:
       - "4004:3000"
-
     restart: unless-stopped
-
-    environment:
-      NODE_ENV: production
-
     depends_on:
       - backend
 
@@ -21,10 +14,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-
     container_name: sitio2-backend
-
+    ports:
+      - "4005:3001"
     restart: unless-stopped
-
-    environment:
-      NODE_ENV: production
