@@ -11,10 +11,16 @@ services:
       - backend
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: sitio2-backend
-    ports:
-      - "4005:3001"
-    restart: unless-stopped
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+
+  container_name: sitio2-backend
+
+  ports:
+    - "4005:3001"
+
+  env_file:
+    - ./backend/.env
+
+  restart: unless-stopped
